@@ -4,38 +4,12 @@ on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  id-token: write
 
 jobs:
   release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - run: corepack enable
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: pnpm
-          registry-url: "https://registry.npmjs.org"
-
-      - run: pnpm install
-      - run: pnpm run test:full
-
-      - name: Publish to npm
-        run: pnpm publish --provenance --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN || secrets.NODE_AUTH_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
-
-      - name: Release to GitHub with changelog
-        run: npx changelogithub
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: sxzz/workflows/.github/workflows/release.yml@v1
+    with:
+      publish: true
+    permissions:
+      contents: write
+      id-token: write
