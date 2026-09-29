@@ -6,7 +6,14 @@
   "description": "Programmatically modify JavaScript and TypeScript source codes with a simplified, elegant syntax. Powered by yuku-parser.",
   "author": "shiinasaku <saku@shiina.xyz>",
   "license": "MIT",
-  "repository": "shiinasaku/fastcast",
+  "homepage": "https://github.com/ShiinaSaku/fastcast#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShiinaSaku/fastcast.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ShiinaSaku/fastcast/issues"
+  },
   "sideEffects": false,
   "exports": {
     ".": "./dist/index.js",
