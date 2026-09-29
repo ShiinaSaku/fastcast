@@ -209,15 +209,6 @@ Performance comparison between the latest upstream release (`magicast@0.5.5` usi
 
 ## Credits & License
 
-`fastcast` is a fork of [`magicast`](https://github.com/unjs/magicast) created by Pooya Parsa and the unjs contributors.
+`fastcast` is a fork of [`magicast`](https://github.com/unjs/magicast) created by [Pooya Parsa](https://x.com/_pi0_) and the unjs contributors.
 
-Published under the [MIT License](./LICENSE).
-
-<!-- Badges -->
-
-[npm-version-src]: https://img.shields.io/npm/v/fastcast?style=flat&colorA=18181B&colorB=F0DB4F
-[npm-version-href]: https://npmjs.com/package/fastcast
-[npm-downloads-src]: https://img.shields.io/npm/dm/fastcast?style=flat&colorA=18181B&colorB=F0DB4F
-[npm-downloads-href]: https://npmjs.com/package/fastcast
-[license-src]: https://img.shields.io/github/license/shiinasaku/fastcast.svg?style=flat&colorA=18181B&colorB=F0DB4F
-[license-href]: https://github.com/shiinasaku/fastcast/blob/main/LICENSE
+Published under the [MIT License (./LICENSE).
