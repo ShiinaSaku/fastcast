@@ -1,0 +1,48 @@
+name: benchmark
+
+on:
+  schedule:
+    # Run every Monday at 00:00 UTC to track performance against latest npm release
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Run benchmark & update README
+        run: pnpm run bench:update
+
+      - name: Commit & push updated README
+        run: |
+          git config user.name "shiinasaku"
+          git config user.email "saku@shiina.xyz"
+          if [ -n "$(git status --porcelain README.md)" ]; then
+            git add README.md
+            git commit -m "chore: update benchmark results in README [skip ci]"
+            git push
+          else
+            echo "No benchmark changes in README.md"
+          fi
