@@ -15,6 +15,9 @@ export default defineConfig({
   exports: {
     legacy: true,
   },
-  external: ["@babel/types"],
+  deps: {
+    neverBundle: ["yuku-parser"],
+    onlyBundle: false,
+  },
   fixedExtension: false,
 });

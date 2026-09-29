@@ -10,8 +10,21 @@ export default defineConfig({
         new URL("vendor/ast-types/src/main.ts", import.meta.url),
       ),
       ...(process.env.TEST_BUILD === "true"
-        ? {}
+        ? {
+            "fastcast/helpers": fileURLToPath(
+              new URL("dist/helpers.js", import.meta.url),
+            ),
+            "fastcast": fileURLToPath(new URL("dist/index.js", import.meta.url)),
+            "magicast/helpers": fileURLToPath(
+              new URL("dist/helpers.js", import.meta.url),
+            ),
+            "magicast": fileURLToPath(new URL("dist/index.js", import.meta.url)),
+          }
         : {
+            "fastcast/helpers": fileURLToPath(
+              new URL("src/helpers/index.ts", import.meta.url),
+            ),
+            "fastcast": fileURLToPath(new URL("src/index.ts", import.meta.url)),
             "magicast/helpers": fileURLToPath(
               new URL("src/helpers/index.ts", import.meta.url),
             ),
