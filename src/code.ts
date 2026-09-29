@@ -7,8 +7,8 @@ import type {
   ProxifiedModule,
 } from "./types";
 import { parse, print, types } from "recast";
-import { getBabelParser } from "./babel";
 import { detectCodeFormat } from "./format";
+import { getParser } from "./parser";
 import { makeProxyUtils } from "./proxy/_utils";
 import { proxifyModule } from "./proxy/module";
 import { proxify } from "./proxy/proxify";
@@ -20,7 +20,7 @@ export function parseModule<Exports extends object = any>(
   options?: ParseOptions,
 ): ProxifiedModule<Exports> {
   const node: ParsedFileNode = parse(code, {
-    parser: options?.parser || getBabelParser(),
+    parser: options?.parser || getParser(),
     ...options,
     // Parse and print must agree on the width of existing tab indentation.
     tabWidth: options?.tabWidth ?? detectCodeFormat(code).tabWidth,
@@ -43,22 +43,25 @@ export function parseExpression<T>(
   const parseCode = isStandaloneComment ? `${code}\nnull` : `(${code})`;
 
   const root: ParsedFileNode = parse(parseCode, {
-    parser: options?.parser || getBabelParser(),
+    parser: options?.parser || getParser(),
     ...options,
   });
   let body: ASTNode = root.program.body[0];
   if (body.type === "ExpressionStatement") {
-    const expr = (body as any).expression;
-    if (isStandaloneComment && (body as any).comments?.length) {
+    const expr = body.expression;
+    if (isStandaloneComment && body.comments?.length) {
       // Transfer comments from ExpressionStatement to the expression node so
       // they survive when the node is embedded into another AST.
-      expr.comments = (body as any).comments;
-      delete (body as any).comments;
+      expr.comments = body.comments;
+      delete body.comments;
     }
     body = expr;
   }
-  if ((body as any).extra?.parenthesized) {
-    (body as any).extra.parenthesized = false;
+  if (body.type === "ParenthesizedExpression") {
+    body = body.expression;
+  }
+  if (body.extra?.parenthesized) {
+    body.extra.parenthesized = false;
   }
 
   if (isStandaloneComment) {

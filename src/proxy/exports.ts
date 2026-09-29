@@ -1,4 +1,4 @@
-import type { Program } from "@babel/types";
+import type { Program } from "yuku-parser";
 import type { ProxifiedModule } from "./types";
 import * as recast from "recast";
 import { createProxy, literalToAst } from "./_utils";
@@ -41,7 +41,7 @@ export function createExportsProxy(root: Program, mod: ProxifiedModule) {
             );
             // WORKAROUND: Recast builder doesn't seem to preserve the async property
             funcExpr.async = decl.async;
-            funcExpr.loc = decl.loc;
+            funcExpr.loc = decl.loc as recast.types.namedTypes.SourceLocation;
             return funcExpr;
           }
         }

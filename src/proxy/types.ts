@@ -3,7 +3,7 @@ import type {
   ImportDefaultSpecifier,
   ImportNamespaceSpecifier,
   ImportSpecifier,
-} from "@babel/types";
+} from "yuku-parser";
 import type { ASTNode, GenerateOptions } from "../types";
 
 export interface ProxyBase {

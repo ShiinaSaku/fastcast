@@ -1,4 +1,4 @@
-import type { BinaryExpression } from "@babel/types";
+import type { BinaryExpression } from "yuku-parser";
 import type { ProxifiedBinaryExpression, ProxifiedModule } from "./types";
 import { createProxy } from "./_utils";
 import { proxify } from "./proxify";

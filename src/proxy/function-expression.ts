@@ -1,4 +1,4 @@
-import type { FunctionExpression } from "@babel/types";
+import type { FunctionExpression } from "yuku-parser";
 import type {
   ProxifiedBlockStatement,
   ProxifiedFunctionExpression,
@@ -16,7 +16,7 @@ export function proxifyFunctionExpression(
   const utils = makeProxyUtils(node, {
     $type: "function-expression",
     $params: proxifyArrayElements(node, node.params, mod),
-    $body: proxify(node.body, mod) as ProxifiedBlockStatement,
+    $body: proxify(node.body!, mod) as ProxifiedBlockStatement,
   });
 
   return new Proxy(() => {}, {

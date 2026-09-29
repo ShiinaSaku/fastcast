@@ -1,4 +1,4 @@
-import type { BlockStatement } from "@babel/types";
+import type { BlockStatement } from "yuku-parser";
 import type { ProxifiedBlockStatement, ProxifiedModule } from "./types";
 import { createProxy } from "./_utils";
 import { proxifyArrayElements } from "./array";

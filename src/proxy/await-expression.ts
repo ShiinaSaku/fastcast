@@ -1,4 +1,4 @@
-import type { AwaitExpression } from "@babel/types";
+import type { AwaitExpression } from "yuku-parser";
 import type { ProxifiedAwaitExpression, ProxifiedModule } from "./types";
 import { MagicastError } from "../error";
 import { createProxy } from "./_utils";

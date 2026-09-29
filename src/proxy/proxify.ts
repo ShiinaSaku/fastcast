@@ -1,8 +1,8 @@
 import type { ASTNode } from "../types";
 import type { Proxified, ProxifiedModule, ProxifiedValue } from "./types";
 import { MagicastError } from "../error";
-import { LITERALS_AST, LITERALS_TYPEOF } from "./_utils";
-import { proxifyArray } from "./array";
+import { createProxy, LITERALS_AST, LITERALS_TYPEOF } from "./_utils";
+import { proxifyArray, proxifyArrayElements } from "./array";
 import { proxifyArrowFunctionExpression } from "./arrow-function-expression";
 import { proxifyAwaitExpression } from "./await-expression";
 import { proxifyBinaryExpression } from "./binary-expression";
@@ -32,13 +32,21 @@ export function proxify<T>(node: ASTNode, mod?: ProxifiedModule): Proxified<T> {
     return undefined as any;
   }
 
-  if (node.type === "RegExpLiteral") {
-    const { pattern, flags } = node;
-    return new RegExp(pattern, flags) as any;
+  if (node.type === "Literal") {
+    if ("regex" in node && node.regex) {
+      const { pattern, flags } = node.regex;
+      return new RegExp(pattern, flags) as Proxified<T>;
+    }
+    return node.value as Proxified<T>;
+  }
+
+  if ((node.type as string) === "RegExpLiteral") {
+    const { pattern, flags } = node as unknown as { pattern: string; flags?: string };
+    return new RegExp(pattern, flags) as Proxified<T>;
   }
 
   if (LITERALS_AST.has(node.type)) {
-    return (node as any).value as any;
+    return (node as unknown as { value: unknown }).value as Proxified<T>;
   }
 
   if (_cache.has(node)) {
@@ -57,6 +65,23 @@ export function proxify<T>(node: ASTNode, mod?: ProxifiedModule): Proxified<T> {
     }
     case "CallExpression": {
       proxy = proxifyFunctionCall(node, mod);
+      break;
+    }
+    case "ImportExpression": {
+      const args: ASTNode[] = [node.source];
+      if (node.options) {
+        args.push(node.options);
+      }
+      const argumentsProxy = proxifyArrayElements(node, args, mod);
+      proxy = createProxy(
+        node,
+        {
+          $type: "function-call",
+          $callee: "import",
+          $args: argumentsProxy,
+        },
+        {},
+      );
       break;
     }
     case "ArrowFunctionExpression": {
@@ -95,6 +120,7 @@ export function proxify<T>(node: ASTNode, mod?: ProxifiedModule): Proxified<T> {
       proxy = proxifyBlockStatement(node, mod);
       break;
     }
+    case "ParenthesizedExpression":
     case "TSAsExpression":
     case "TSSatisfiesExpression": {
       proxy = proxify(node.expression, mod) as ProxifiedValue;

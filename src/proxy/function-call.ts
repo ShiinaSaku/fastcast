@@ -16,7 +16,7 @@ export function proxifyFunctionCall<T extends []>(
     if (node.type === "Identifier") {
       return node.name;
     }
-    if (node.type === "Import") {
+    if ((node.type as string) === "Import") {
       return "import";
     }
     if (node.type === "MemberExpression") {

@@ -4,7 +4,7 @@ import type {
   ImportNamespaceSpecifier,
   ImportSpecifier,
   Program,
-} from "@babel/types";
+} from "yuku-parser";
 import type {
   ImportItemInput,
   ProxifiedImportItem,

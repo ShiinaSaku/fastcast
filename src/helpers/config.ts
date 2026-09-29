@@ -1,4 +1,4 @@
-import type { Program, VariableDeclarator } from "@babel/types";
+import type { Program, VariableDeclarator } from "yuku-parser";
 import type { Proxified, ProxifiedModule, ProxifiedObject } from "../types";
 import { generateCode, parseExpression } from "../code";
 import { MagicastError } from "../error";
