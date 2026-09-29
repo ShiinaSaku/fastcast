@@ -1,13 +1,34 @@
 name: Publish Any Commit
-on: [push, pull_request]
 
-permissions: {}
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  release:
-    uses: sxzz/workflows/.github/workflows/release-commit.yml@v1
-    with:
-      compact: true
+  release-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - run: corepack enable
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install
+      - run: pnpm build
+
+      - name: Publish preview with pkg-pr-new
+        run: pnpm dlx pkg-pr-new publish --pnpm --compact
+        continue-on-error: true
