@@ -20,4 +20,5 @@ export default defineConfig({
     onlyBundle: false,
   },
   fixedExtension: false,
+  minify: true,
 });
