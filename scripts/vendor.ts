@@ -135,6 +135,14 @@ async function cloneAstTypes() {
       return line;
     });
 
+    // Convert non-const namespace exports to const for Oxc / Rolldown transformer compatibility
+    await filterLines("vendor/ast-types/src/gen/namedTypes.ts", (line) => {
+      return line.replace(
+        /export (?:let|var) (\w+): Type<(\w+)>;/,
+        "export const $1: Type<$2> = undefined as unknown as Type<$2>;",
+      );
+    });
+
     console.log("vendor/ast-types cloned");
   }
 }
