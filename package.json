@@ -1,11 +1,12 @@
 {
-  "name": "magicast",
+  "name": "fastcast",
   "type": "module",
-  "version": "0.5.5",
-  "packageManager": "pnpm@12.3.4",
-  "description": "Modify a JS/TS file and write back magically just like JSON!",
+  "version": "0.0.1",
+  "packageManager": "pnpm@12.6.0",
+  "description": "Programmatically modify JavaScript and TypeScript source codes with a simplified, elegant syntax. Powered by yuku-parser.",
+  "author": "shiinasaku <saku@shiina.xyz>",
   "license": "MIT",
-  "repository": "unjs/magicast",
+  "repository": "shiinasaku/fastcast",
   "sideEffects": false,
   "exports": {
     ".": "./dist/index.js",
@@ -29,36 +30,37 @@
     "prepack": "pnpm run build",
     "typecheck": "tsc --noEmit",
     "release": "pnpm run test run && bumpp",
+    "bench": "tsx ./scripts/benchmark.ts",
+    "bench:update": "tsx ./scripts/benchmark.ts --update-readme",
     "test": "vitest",
     "test:build": "TEST_BUILD=true vitest",
     "test:full": "pnpm run test --run && pnpm run build && pnpm run test:build --run"
   },
   "dependencies": {
-    "@babel/parser": "^7.29.7",
-    "@babel/types": "^7.29.7",
-    "source-map-js": "^1.2.1"
+    "source-map-js": "^1.2.1",
+    "yuku-parser": "^0.13.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.5.1",
-    "@types/node": "^26.5.1",
-    "@vitest/coverage-v8": "^5.0.0",
-    "@vitest/ui": "^5.0.0",
+    "@types/node": "^26.6.3",
+    "@vitest/coverage-v8": "^5.0.2",
+    "@vitest/ui": "^5.0.2",
     "ast-types": "^0.16.3",
     "bumpp": "^12.3.0",
-    "eslint": "^10.10.0",
+    "eslint": "^10.11.0",
+    "fastcast": "workspace:*",
     "giget": "^3.3.1",
     "jiti": "^2.7.0",
-    "magicast": "workspace:*",
     "nano-staged": "^1.0.2",
-    "prettier": "^3.9.6",
+    "prettier": "^3.9.9",
     "recast": "^0.24.0",
     "simple-git-hooks": "^2.14.0",
     "source-map": "npm:source-map-js@latest",
-    "taze": "^21.1.0",
+    "taze": "^21.2.0",
     "tsdown": "^0.23.0",
-    "tsx": "^4.23.13",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.2"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm nano-staged"
