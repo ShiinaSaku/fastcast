@@ -15,9 +15,9 @@ export class MagicastError extends Error {
     this.rawMessage = message;
     this.options = options;
 
-    if (options?.ast && options?.code && options.ast.loc) {
+    if (options?.ast && options?.code && options.ast.loc?.start) {
       // construct a code frame point to the start of the ast node
-      const { line, column } = options.ast.loc.start;
+      const { line = 1, column = 0 } = options.ast.loc.start;
       const lines = options.code.split("\n");
       const start = Math.max(0, line - 3);
       const end = Math.min(lines.length, line + 3);

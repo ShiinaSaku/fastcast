@@ -149,7 +149,7 @@ describe("array", () => {
     indexes.length = 0;
     mod.exports.default.forEach((_, index) => indexes.push(index));
     expect(indexes).toEqual([0, 2]);
-    expect(mod.exports.default.reduce((sum, value) => sum + value)).toBe(4);
+    expect(mod.exports.default.reduce((sum, value) => (sum ?? 0) + (value ?? 0))).toBe(4);
 
     const deleted = mod.exports.default.splice(0);
     expect([...deleted]).toEqual([1, undefined, 3]);

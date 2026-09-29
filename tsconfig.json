@@ -5,11 +5,25 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "paths": {
-      "magicast/helpers": ["./src/helpers/index.ts"],
-      "magicast": ["./src/index.ts"]
+      "fastcast/helpers": [
+        "./src/helpers/index.ts"
+      ],
+      "fastcast": [
+        "./src/index.ts"
+      ],
+      "magicast/helpers": [
+        "./src/helpers/index.ts"
+      ],
+      "magicast": [
+        "./src/index.ts"
+      ]
     },
     "strict": true,
     "esModuleInterop": true
   },
-  "exclude": ["dist", "vendor"]
+  "exclude": [
+    "dist",
+    "vendor",
+    "eslint.config.ts"
+  ]
 }

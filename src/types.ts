@@ -1,14 +1,31 @@
-import type { Program } from "@babel/types";
 import type { Options as ParseOptions } from "recast";
+import type { AttachedComment, Comment, Node, Program } from "yuku-parser";
 import type { CodeFormatOptions } from "./format";
 
 export * from "./proxy/types";
-export type { Node as ASTNode } from "@babel/types";
+
+declare module "yuku-parser" {
+  interface BaseNode {
+    loc?: Loc;
+    innerComments?: AttachedComment[];
+    leadingComments?: AttachedComment[];
+    trailingComments?: AttachedComment[];
+    extra?: Record<string, unknown>;
+  }
+}
+
+export type ASTNode = Node;
+
+export interface LocPosition {
+  line?: number;
+  column?: number;
+  token?: number;
+}
 
 export interface Loc {
-  start?: { line?: number; column?: number; token?: number };
-  end?: { line?: number; column?: number; token?: number };
-  lines?: any;
+  start?: LocPosition;
+  end?: LocPosition;
+  lines?: unknown;
 }
 
 export interface Token {
@@ -21,7 +38,8 @@ export interface ParsedFileNode {
   type: "file";
   program: Program;
   loc: Loc;
-  comments: null | any;
+  comments: null | Comment[];
+  tokens?: Token[];
 }
 
 export type GenerateOptions = ParseOptions & {
