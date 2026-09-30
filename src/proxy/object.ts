@@ -8,6 +8,14 @@ import { proxify } from "./proxify";
 
 const b = recast.types.builders;
 
+interface ObjectMethodLike {
+  params: ASTNode[];
+  body: ASTNode;
+  generator?: boolean;
+  async?: boolean;
+  loc?: recast.types.namedTypes.SourceLocation;
+}
+
 export function proxifyObject<T extends object>(
   node: ASTNode,
   mod?: ProxifiedModule,
@@ -64,6 +72,22 @@ export function proxifyObject<T extends object>(
     return propIndex;
   };
 
+  const methodToFunctionExpression = (
+    methodProp: ObjectMethodLike,
+  ): ASTNode => {
+    const funcExpr = b.functionExpression(
+      null, // id must be null, not undefined
+      methodProp.params as any,
+      methodProp.body as any,
+      methodProp.generator,
+      methodProp.async,
+    );
+    // WORKAROUND: Recast builder doesn't seem to preserve the async property
+    funcExpr.async = methodProp.async;
+    funcExpr.loc = methodProp.loc;
+    return funcExpr as unknown as ASTNode;
+  };
+
   const getProp = (key: string | symbol): ASTNode | undefined => {
     const prop = getPropIndex().get(String(key));
     if (prop) {
@@ -71,24 +95,7 @@ export function proxifyObject<T extends object>(
         return prop.value as ASTNode;
       }
       if ("params" in prop && "body" in prop) {
-        const methodProp = prop as unknown as {
-          params: ASTNode[];
-          body: ASTNode;
-          generator?: boolean;
-          async?: boolean;
-          loc?: recast.types.namedTypes.SourceLocation;
-        };
-        const funcExpr = b.functionExpression(
-          null, // id must be null, not undefined
-          methodProp.params as any,
-          methodProp.body as any,
-          methodProp.generator,
-          methodProp.async,
-        );
-        // WORKAROUND: Recast builder doesn't seem to preserve the async property
-        funcExpr.async = methodProp.async;
-        funcExpr.loc = methodProp.loc;
-        return funcExpr as unknown as ASTNode;
+        return methodToFunctionExpression(prop as ObjectMethodLike);
       }
     }
   };
@@ -143,24 +150,10 @@ export function proxifyObject<T extends object>(
               acc[propName] = proxify(prop.value, mod);
             }
             else if ("params" in prop && "body" in prop) {
-              const methodProp = prop as unknown as {
-                params: ASTNode[];
-                body: ASTNode;
-                generator?: boolean;
-                async?: boolean;
-                loc?: recast.types.namedTypes.SourceLocation;
-              };
-              const funcExpr = b.functionExpression(
-                null, // id must be null, not undefined
-                methodProp.params as any,
-                methodProp.body as any,
-                methodProp.generator,
-                methodProp.async,
+              acc[propName] = proxify(
+                methodToFunctionExpression(prop as ObjectMethodLike),
+                mod,
               );
-              // WORKAROUND: Recast builder doesn't seem to preserve the async property
-              funcExpr.async = methodProp.async;
-              funcExpr.loc = methodProp.loc;
-              acc[propName] = proxify(funcExpr as unknown as ASTNode, mod);
             }
           }
           return acc;

@@ -7,9 +7,11 @@ import { proxify } from "./proxify";
 const b = recast.types.builders;
 
 export function createExportsProxy(root: Program, mod: ProxifiedModule) {
+  const exportType = (key: string | symbol) =>
+    key === "default" ? "ExportDefaultDeclaration" : "ExportNamedDeclaration";
+
   const findExport = (key: string) => {
-    const type
-      = key === "default" ? "ExportDefaultDeclaration" : "ExportNamedDeclaration";
+    const type = exportType(key);
 
     for (const n of root.body) {
       if (n.type === type) {
@@ -51,8 +53,7 @@ export function createExportsProxy(root: Program, mod: ProxifiedModule) {
   };
 
   const updateOrAddExport = (key: string, value: any) => {
-    const type
-      = key === "default" ? "ExportDefaultDeclaration" : "ExportNamedDeclaration";
+    const type = exportType(key);
 
     const node = literalToAst(value) as any;
     for (const n of root.body) {
@@ -139,10 +140,7 @@ export function createExportsProxy(root: Program, mod: ProxifiedModule) {
           .filter(Boolean);
       },
       deleteProperty(_, prop) {
-        const type
-          = prop === "default"
-            ? "ExportDefaultDeclaration"
-            : "ExportNamedDeclaration";
+        const type = exportType(prop);
 
         for (let i = 0; i < root.body.length; i++) {
           const n = root.body[i];

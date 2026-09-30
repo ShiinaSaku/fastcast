@@ -4,8 +4,7 @@ import type {
   ProxifiedFunctionExpression,
   ProxifiedModule,
 } from "./types";
-import { MagicastError } from "../error";
-import { makeProxyUtils } from "./_utils";
+import { createFunctionProxy, makeProxyUtils } from "./_utils";
 import { proxifyArrayElements } from "./array";
 import { proxify } from "./proxify";
 
@@ -19,17 +18,5 @@ export function proxifyFunctionExpression(
     $body: proxify(node.body!, mod) as ProxifiedBlockStatement,
   });
 
-  return new Proxy(() => {}, {
-    get(target, key, receiver) {
-      if (key in utils) {
-        return (utils as any)[key];
-      }
-      return Reflect.get(target, key, receiver);
-    },
-    apply() {
-      throw new MagicastError(
-        "Calling proxified functions is not supported. Use `generateCode` to get the code string.",
-      );
-    },
-  }) as unknown as ProxifiedFunctionExpression;
+  return createFunctionProxy<ProxifiedFunctionExpression>(utils);
 }

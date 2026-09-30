@@ -96,7 +96,7 @@ export function literalToAst(value: any, seen = new Set()): ASTNode {
         Object.entries(value).map(([key, value]) => {
           return b.property(
             "init",
-            /^[$A-Z_][\w$]*$/i.test(key) ? b.identifier(key) : b.literal(key),
+            isValidPropName(key) ? b.identifier(key) : b.literal(key),
             literalToAst(value, seen) as any,
           ) as any;
         }),
@@ -107,6 +107,42 @@ export function literalToAst(value: any, seen = new Set()): ASTNode {
   finally {
     seen.delete(value);
   }
+}
+
+/**
+ * Render a callee node (`foo`, `foo.bar`, `import`) as a string.
+ */
+export function stringifyCallee(node: ASTNode): string {
+  if (node.type === "Identifier") {
+    return node.name;
+  }
+  if ((node.type as string) === "Import") {
+    return "import";
+  }
+  if (node.type === "MemberExpression") {
+    return `${stringifyCallee(node.object)}.${stringifyCallee(node.property)}`;
+  }
+  throw new MagicastError("Not implemented");
+}
+
+/**
+ * Wrap function-like nodes in a callable proxy that exposes `utils` and throws
+ * if the proxified function is invoked.
+ */
+export function createFunctionProxy<T>(utils: Record<string, any>): T {
+  return new Proxy(() => {}, {
+    get(target, key, receiver) {
+      if (key in utils) {
+        return (utils as any)[key];
+      }
+      return Reflect.get(target, key, receiver);
+    },
+    apply() {
+      throw new MagicastError(
+        "Calling proxified functions is not supported. Use `generateCode` to get the code string.",
+      );
+    },
+  }) as T;
 }
 
 export function makeProxyUtils<T extends object>(

@@ -1,7 +1,7 @@
 import type { ASTNode } from "../types";
 import type { ProxifiedFunctionCall, ProxifiedModule } from "./types";
 import { MagicastError } from "../error";
-import { createProxy } from "./_utils";
+import { createProxy, stringifyCallee } from "./_utils";
 import { proxifyArrayElements } from "./array";
 
 export function proxifyFunctionCall<T extends []>(
@@ -12,28 +12,13 @@ export function proxifyFunctionCall<T extends []>(
     throw new MagicastError("Not a function call");
   }
 
-  function stringifyExpression(node: ASTNode): string {
-    if (node.type === "Identifier") {
-      return node.name;
-    }
-    if ((node.type as string) === "Import") {
-      return "import";
-    }
-    if (node.type === "MemberExpression") {
-      return `${stringifyExpression(node.object)}.${stringifyExpression(
-        node.property,
-      )}`;
-    }
-    throw new MagicastError("Not implemented");
-  }
-
   const argumentsProxy = proxifyArrayElements<T>(node, node.arguments, mod);
 
   return createProxy(
     node,
     {
       $type: "function-call",
-      $callee: stringifyExpression(node.callee as any),
+      $callee: stringifyCallee(node.callee as any),
       $args: argumentsProxy,
     },
     {},
