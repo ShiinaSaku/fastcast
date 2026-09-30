@@ -48,39 +48,53 @@ export function proxifyObject<T extends object>(
     return undefined;
   };
 
+  // Lazily built `name -> property node` index, kept in sync by the mutating
+  // traps so lookups stay O(1) instead of scanning the property list.
+  let propIndex: Map<string, any> | undefined;
+  const getPropIndex = (): Map<string, any> => {
+    if (!propIndex) {
+      propIndex = new Map();
+      for (const prop of objNode.properties as (ObjectProperty | ASTNode)[]) {
+        const name = getPropName(prop);
+        if (name !== undefined && !propIndex.has(name)) {
+          propIndex.set(name, prop);
+        }
+      }
+    }
+    return propIndex;
+  };
+
   const getProp = (key: string | symbol): ASTNode | undefined => {
-    const stringKey = String(key);
-    for (const prop of objNode.properties as (ObjectProperty | ASTNode)[]) {
-      if (getPropName(prop) === stringKey) {
-        if ("value" in prop && prop.value) {
-          return prop.value as ASTNode;
-        }
-        if ("params" in prop && "body" in prop) {
-          const methodProp = prop as unknown as {
-            params: ASTNode[];
-            body: ASTNode;
-            generator?: boolean;
-            async?: boolean;
-            loc?: recast.types.namedTypes.SourceLocation;
-          };
-          const funcExpr = b.functionExpression(
-            null, // id must be null, not undefined
-            methodProp.params as any,
-            methodProp.body as any,
-            methodProp.generator,
-            methodProp.async,
-          );
-          // WORKAROUND: Recast builder doesn't seem to preserve the async property
-          funcExpr.async = methodProp.async;
-          funcExpr.loc = methodProp.loc;
-          return funcExpr as unknown as ASTNode;
-        }
+    const prop = getPropIndex().get(String(key));
+    if (prop) {
+      if ("value" in prop && prop.value) {
+        return prop.value as ASTNode;
+      }
+      if ("params" in prop && "body" in prop) {
+        const methodProp = prop as unknown as {
+          params: ASTNode[];
+          body: ASTNode;
+          generator?: boolean;
+          async?: boolean;
+          loc?: recast.types.namedTypes.SourceLocation;
+        };
+        const funcExpr = b.functionExpression(
+          null, // id must be null, not undefined
+          methodProp.params as any,
+          methodProp.body as any,
+          methodProp.generator,
+          methodProp.async,
+        );
+        // WORKAROUND: Recast builder doesn't seem to preserve the async property
+        funcExpr.async = methodProp.async;
+        funcExpr.loc = methodProp.loc;
+        return funcExpr as unknown as ASTNode;
       }
     }
   };
 
   const replaceOrAddProp = (key: string, value: ASTNode) => {
-    const prop = objNode.properties.find(p => getPropName(p) === key);
+    const prop = getPropIndex().get(key);
     if (prop) {
       if ("value" in prop) {
         (prop as ObjectProperty).value = value as any;
@@ -90,6 +104,7 @@ export function proxifyObject<T extends object>(
         const index = objNode.properties.indexOf(prop);
         if (index !== -1) {
           objNode.properties[index] = newProp as any;
+          propIndex!.set(key, newProp as any);
         }
       }
     }
@@ -112,6 +127,7 @@ export function proxifyObject<T extends object>(
         objNode.innerComments = [];
       }
       objNode.properties.push(newProp as any);
+      propIndex!.set(key, newProp as any);
     }
   };
 
@@ -169,9 +185,13 @@ export function proxifyObject<T extends object>(
         if (typeof key !== "string") {
           key = String(key);
         }
-        const index = objNode.properties.findIndex(p => getPropName(p) === key);
-        if (index !== -1) {
-          objNode.properties.splice(index, 1);
+        const prop = getPropIndex().get(key);
+        if (prop) {
+          const index = objNode.properties.indexOf(prop);
+          if (index !== -1) {
+            objNode.properties.splice(index, 1);
+          }
+          propIndex!.delete(key);
         }
         return true;
       },
@@ -181,10 +201,7 @@ export function proxifyObject<T extends object>(
           .filter(Boolean) as string[];
       },
       getOwnPropertyDescriptor(target, key) {
-        if (
-          typeof key === "string"
-          && Array.from(this.ownKeys!(target)).includes(key)
-        ) {
+        if (typeof key === "string" && getPropIndex().has(key)) {
           return {
             enumerable: true,
             configurable: true,
@@ -194,7 +211,7 @@ export function proxifyObject<T extends object>(
       },
       has(_, key) {
         if (typeof key === "string") {
-          return Array.from(this.ownKeys!(_)).includes(key);
+          return getPropIndex().has(key);
         }
         return false;
       },
