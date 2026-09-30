@@ -29,6 +29,12 @@ export function isValidPropName(name: string) {
 
 const PROXY_KEY = "__magicast_proxy";
 
+/**
+ * Convert a runtime value into an AST node.
+ *
+ * Supports primitives, arrays, plain objects, `RegExp`, `Set`, `Date`, `Map`,
+ * and forward proxies (returning their `$ast`). Throws on circular references.
+ */
 export function literalToAst(value: any, seen = new Set()): ASTNode {
   if (value === undefined) {
     return b.identifier("undefined") as any;
@@ -42,58 +48,65 @@ export function literalToAst(value: any, seen = new Set()): ASTNode {
   if (seen.has(value)) {
     throw new MagicastError("Can not serialize circular reference");
   }
+  // `seen` tracks only the current recursion path, so a value referenced from
+  // two sibling positions (a DAG, not a cycle) is serialized twice instead of
+  // being mistaken for a circular reference.
   seen.add(value);
+  try {
+    // forward proxy
+    if (value[PROXY_KEY]) {
+      return value.$ast;
+    }
 
-  // forward proxy
-  if (value[PROXY_KEY]) {
-    return value.$ast;
-  }
-
-  if (value instanceof RegExp) {
-    const regex = b.regExpLiteral(value.source, value.flags) as any;
-    // seems to be a bug in recast
-    delete regex.extra.raw;
-    return regex;
-  }
-  if (value instanceof Set) {
-    return b.newExpression(b.identifier("Set"), [
-      b.arrayExpression([...value].map(n => literalToAst(n, seen)) as any),
-    ]) as any;
-  }
-  if (value instanceof Date) {
-    return b.newExpression(b.identifier("Date"), [
-      b.literal(value.toISOString()),
-    ]) as any;
-  }
-  if (value instanceof Map) {
-    return b.newExpression(b.identifier("Map"), [
-      b.arrayExpression(
-        [...value].map(([key, value]) => {
-          return b.arrayExpression([
-            literalToAst(key, seen) as any,
+    if (value instanceof RegExp) {
+      const regex = b.regExpLiteral(value.source, value.flags) as any;
+      // seems to be a bug in recast
+      delete regex.extra.raw;
+      return regex;
+    }
+    if (value instanceof Set) {
+      return b.newExpression(b.identifier("Set"), [
+        b.arrayExpression([...value].map(n => literalToAst(n, seen)) as any),
+      ]) as any;
+    }
+    if (value instanceof Date) {
+      return b.newExpression(b.identifier("Date"), [
+        b.literal(value.toISOString()),
+      ]) as any;
+    }
+    if (value instanceof Map) {
+      return b.newExpression(b.identifier("Map"), [
+        b.arrayExpression(
+          [...value].map(([key, value]) => {
+            return b.arrayExpression([
+              literalToAst(key, seen) as any,
+              literalToAst(value, seen) as any,
+            ]) as any;
+          }) as any,
+        ),
+      ]) as any;
+    }
+    if (Array.isArray(value)) {
+      return b.arrayExpression(
+        value.map(n => literalToAst(n, seen)) as any,
+      ) as any;
+    }
+    if (typeof value === "object") {
+      return b.objectExpression(
+        Object.entries(value).map(([key, value]) => {
+          return b.property(
+            "init",
+            /^[$A-Z_][\w$]*$/i.test(key) ? b.identifier(key) : b.literal(key),
             literalToAst(value, seen) as any,
-          ]) as any;
-        }) as any,
-      ),
-    ]) as any;
+          ) as any;
+        }),
+      ) as any;
+    }
+    return b.literal(value) as any;
   }
-  if (Array.isArray(value)) {
-    return b.arrayExpression(
-      value.map(n => literalToAst(n, seen)) as any,
-    ) as any;
+  finally {
+    seen.delete(value);
   }
-  if (typeof value === "object") {
-    return b.objectExpression(
-      Object.entries(value).map(([key, value]) => {
-        return b.property(
-          "init",
-          /^[$A-Z_][\w$]*$/i.test(key) ? b.identifier(key) : b.literal(key),
-          literalToAst(value, seen) as any,
-        ) as any;
-      }),
-    ) as any;
-  }
-  return b.literal(value) as any;
 }
 
 export function makeProxyUtils<T extends object>(
