@@ -17,11 +17,12 @@ export function createExportsProxy(root: Program, mod: ProxifiedModule) {
           return n.declaration;
         }
         if (n.declaration) {
-          // `export const greet = 'hi'`
+          // `export const greet = 'hi'` (including multiple declarators)
           if (n.declaration.type === "VariableDeclaration") {
-            const dec = n.declaration.declarations[0];
-            if ("name" in dec.id && dec.id.name === key) {
-              return dec.init as any;
+            for (const dec of n.declaration.declarations) {
+              if ("name" in dec.id && dec.id.name === key) {
+                return dec.init as any;
+              }
             }
           }
           // `export function greet() {}`
@@ -62,10 +63,11 @@ export function createExportsProxy(root: Program, mod: ProxifiedModule) {
         }
         if (n.declaration) {
           if (n.declaration.type === "VariableDeclaration") {
-            const dec = n.declaration.declarations[0];
-            if ("name" in dec.id && dec.id.name === key) {
-              dec.init = node;
-              return;
+            for (const dec of n.declaration.declarations) {
+              if ("name" in dec.id && dec.id.name === key) {
+                dec.init = node;
+                return;
+              }
             }
           }
           if (
@@ -151,9 +153,17 @@ export function createExportsProxy(root: Program, mod: ProxifiedModule) {
             }
             if (n.declaration) {
               if (n.declaration.type === "VariableDeclaration") {
-                const dec = n.declaration.declarations[0];
-                if ("name" in dec.id && dec.id.name === prop) {
-                  root.body.splice(i, 1);
+                const declarations = n.declaration.declarations;
+                const di = declarations.findIndex(
+                  dec => "name" in dec.id && dec.id.name === prop,
+                );
+                if (di !== -1) {
+                  if (declarations.length === 1) {
+                    root.body.splice(i, 1);
+                  }
+                  else {
+                    declarations.splice(di, 1);
+                  }
                   return true;
                 }
               }
