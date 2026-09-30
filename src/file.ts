@@ -1,6 +1,8 @@
 import type { Options as ParseOptions } from "recast";
 import type { ASTNode, ProxifiedModule } from "./types";
+import { randomBytes } from "node:crypto";
 import { promises as fsp } from "node:fs";
+import process from "node:process";
 import { generateCode, parseModule } from "./code";
 
 export async function loadFile<Exports extends object = any>(
@@ -19,7 +21,19 @@ export async function writeFile(
 ): Promise<void> {
   const ast = "$ast" in node ? node.$ast : node;
   const { code, map } = generateCode(ast, options);
-  await fsp.writeFile(filename as string, code);
+
+  // Write to a sibling temp file and rename into place, so an interrupted
+  // write can never leave a half-written config behind.
+  const tmpFile = `${filename}.${process.pid}.${randomBytes(6).toString("hex")}.tmp`;
+  try {
+    await fsp.writeFile(tmpFile, code);
+    await fsp.rename(tmpFile, filename as string);
+  }
+  catch (error) {
+    await fsp.rm(tmpFile, { force: true }).catch(() => {});
+    throw error;
+  }
+
   if (map) {
     await fsp.writeFile(`${filename}.map`, map);
   }
