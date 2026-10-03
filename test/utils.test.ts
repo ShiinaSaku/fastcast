@@ -3,7 +3,7 @@ import { print } from "recast";
 import { describe, expect, it } from "vitest";
 
 describe("literalToAst", () => {
-  function run(value: any) {
+  function run(value: unknown) {
     return print(builders.literal(value)).code;
   }
 
@@ -44,9 +44,18 @@ describe("literalToAst", () => {
   });
 
   it("circular reference", () => {
-    const obj: any = {};
+    const obj: Record<string, unknown> = {};
     obj.foo = obj;
     expect(() => run(obj)).toThrowError("Can not serialize circular reference");
+  });
+
+  it("rejects values that have no JavaScript literal syntax", () => {
+    expect(() => run(Symbol("value"))).toThrowError(
+      "Can not serialize value of type \"symbol\"",
+    );
+    expect(() => run(() => undefined)).toThrowError(
+      "Can not serialize value of type \"function\"",
+    );
   });
 
   describe("makeProxyUtils", () => {

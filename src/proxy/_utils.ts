@@ -33,17 +33,27 @@ const PROXY_KEY = "__magicast_proxy";
  * Convert a runtime value into an AST node.
  *
  * Supports primitives, arrays, plain objects, `RegExp`, `Set`, `Date`, `Map`,
- * and forward proxies (returning their `$ast`). Throws on circular references.
+ * and forward proxies (returning their `$ast`). Symbols and functions cannot be
+ * represented as JavaScript literals and are rejected. Circular references also
+ * throw.
  */
-export function literalToAst(value: any, seen = new Set()): ASTNode {
+export function literalToAst(value: unknown, seen = new Set<object>()): ASTNode {
   if (value === undefined) {
     return b.identifier("undefined") as any;
   }
   if (value === null) {
     return b.literal(null) as any;
   }
-  if (LITERALS_TYPEOF.has(typeof value)) {
+  if (
+    typeof value === "string"
+    || typeof value === "number"
+    || typeof value === "boolean"
+    || typeof value === "bigint"
+  ) {
     return b.literal(value) as any;
+  }
+  if (typeof value !== "object") {
+    throw new MagicastError(`Can not serialize value of type "${typeof value}"`);
   }
   if (seen.has(value)) {
     throw new MagicastError("Can not serialize circular reference");
@@ -53,9 +63,12 @@ export function literalToAst(value: any, seen = new Set()): ASTNode {
   // being mistaken for a circular reference.
   seen.add(value);
   try {
-    // forward proxy
-    if (value[PROXY_KEY]) {
-      return value.$ast;
+    // A proxified value can be inserted directly without serializing its wrapper.
+    if (
+      Reflect.get(value, PROXY_KEY) === true
+      && typeof Reflect.get(value, "$ast") === "object"
+    ) {
+      return Reflect.get(value, "$ast") as ASTNode;
     }
 
     if (value instanceof RegExp) {

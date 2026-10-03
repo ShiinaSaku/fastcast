@@ -19,6 +19,9 @@
       ]
     },
     "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
     "esModuleInterop": true
   },
   "exclude": [

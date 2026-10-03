@@ -4,7 +4,7 @@ import type {
   ImportNamespaceSpecifier,
   ImportSpecifier,
 } from "yuku-parser";
-import type { ASTNode, GenerateOptions } from "../types";
+import type { ASTNode, GenerateOptions, GenerateResult } from "../types";
 
 export interface ProxyBase {
   $ast: ASTNode;
@@ -132,7 +132,7 @@ export type ProxifiedModule<T extends object = Record<string, any>>
     $code: string;
     exports: ProxifiedObject<T>;
     imports: ProxifiedImportsMap;
-    generate: (options?: GenerateOptions) => { code: string; map?: any };
+    generate: (options?: GenerateOptions) => GenerateResult;
   };
 
 export type ProxifiedImportsMap = Record<string, ProxifiedImportItem>

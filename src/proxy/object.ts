@@ -98,6 +98,7 @@ export function proxifyObject<T extends object>(
         return methodToFunctionExpression(prop as ObjectMethodLike);
       }
     }
+    return undefined;
   };
 
   const replaceOrAddProp = (key: string, value: ASTNode) => {

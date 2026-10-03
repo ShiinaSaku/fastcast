@@ -2,20 +2,21 @@ ignoreWorkspaceRootCheck: true
 
 minimumReleaseAgeExcludePrune: true
 minimumReleaseAgeExclude:
-  - "@yuku-parser/binding-android-arm64@0.13.0"
-  - "@yuku-parser/binding-darwin-arm64@0.13.0"
-  - "@yuku-parser/binding-darwin-x64@0.13.0"
-  - "@yuku-parser/binding-freebsd-x64@0.13.0"
-  - "@yuku-parser/binding-linux-arm-gnu@0.13.0"
-  - "@yuku-parser/binding-linux-arm-musl@0.13.0"
-  - "@yuku-parser/binding-linux-arm64-gnu@0.13.0"
-  - "@yuku-parser/binding-linux-arm64-musl@0.13.0"
-  - "@yuku-parser/binding-linux-x64-gnu@0.13.0"
-  - "@yuku-parser/binding-linux-x64-musl@0.13.0"
-  - "@yuku-parser/binding-win32-arm64@0.13.0"
-  - "@yuku-parser/binding-win32-x64@0.13.0"
-  - "@yuku-toolchain/types@0.13.0"
-  - yuku-parser@0.13.0
+  - "@yuku-core/binding-android-arm64@0.17.0"
+  - "@yuku-core/binding-darwin-arm64@0.17.0"
+  - "@yuku-core/binding-darwin-x64@0.17.0"
+  - "@yuku-core/binding-freebsd-x64@0.17.0"
+  - "@yuku-core/binding-linux-arm-gnu@0.17.0"
+  - "@yuku-core/binding-linux-arm-musl@0.17.0"
+  - "@yuku-core/binding-linux-arm64-gnu@0.17.0"
+  - "@yuku-core/binding-linux-arm64-musl@0.17.0"
+  - "@yuku-core/binding-linux-x64-gnu@0.17.0"
+  - "@yuku-core/binding-linux-x64-musl@0.17.0"
+  - "@yuku-core/binding-win32-arm64@0.17.0"
+  - "@yuku-core/binding-win32-x64@0.17.0"
+  - "@yuku-toolchain/types@0.17.0"
+  - yuku-core@0.17.0
+  - yuku-parser@0.17.0
 
 trustPolicy: no-downgrade
 trustPolicyExclude:

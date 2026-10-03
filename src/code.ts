@@ -2,6 +2,7 @@ import type { Options as ParseOptions } from "recast";
 import type {
   ASTNode,
   GenerateOptions,
+  GenerateResult,
   ParsedFileNode,
   Proxified,
   ProxifiedModule,
@@ -15,6 +16,16 @@ import { proxify } from "./proxy/proxify";
 
 const b = types.builders;
 
+/**
+ * Parse a JavaScript or TypeScript module into a mutable proxy.
+ *
+ * Provide `Exports` when using TypeScript to type the module's exports, for
+ * example `parseModule<{ default: { plugins: string[] } }>(source)`.
+ *
+ * @param code Module source text.
+ * @param options Parser and printer options.
+ * @returns A module proxy exposing mutable `imports` and `exports` views.
+ */
 export function parseModule<Exports extends object = any>(
   code: string,
   options?: ParseOptions,
@@ -28,6 +39,14 @@ export function parseModule<Exports extends object = any>(
   return proxifyModule(node, code);
 }
 
+/**
+ * Parse a single JavaScript or TypeScript expression into a mutable proxy.
+ *
+ * @typeParam T Expected runtime shape of the expression.
+ * @param code Source text containing one expression.
+ * @param options Parser and printer options.
+ * @returns A proxy for the parsed expression.
+ */
 export function parseExpression<T>(
   code: string,
   options?: ParseOptions,
@@ -83,10 +102,17 @@ export function parseExpression<T>(
   return proxify(body, mod);
 }
 
+/**
+ * Print a proxified value or AST node to JavaScript source.
+ *
+ * @param node Proxified value, module, or AST node to print.
+ * @param options Printer options and optional formatting overrides.
+ * @returns Generated source code and, when requested, its source map.
+ */
 export function generateCode(
   node: { $ast: ASTNode } | ASTNode | ProxifiedModule<any>,
   options: GenerateOptions = {},
-): { code: string; map?: any } {
+): GenerateResult {
   let ast = (node as Proxified).$ast || node;
 
   if (ast.type === "FunctionExpression") {

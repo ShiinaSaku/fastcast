@@ -1,4 +1,5 @@
 import type { Options as ParseOptions } from "recast";
+import type { RawSourceMap } from "source-map-js";
 import type { AttachedComment, Comment, Node, Program } from "yuku-parser";
 import type { CodeFormatOptions } from "./format";
 
@@ -45,3 +46,9 @@ export interface ParsedFileNode {
 export type GenerateOptions = ParseOptions & {
   format?: false | CodeFormatOptions;
 };
+
+/** Source output and optional source-map data returned by code generation. */
+export interface GenerateResult {
+  code: string;
+  map?: RawSourceMap;
+}

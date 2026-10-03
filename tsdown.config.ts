@@ -12,9 +12,15 @@ export default defineConfig({
     "recast": resolve(import.meta.dirname, "vendor/recast/main.ts"),
     "ast-types": resolve(import.meta.dirname, "vendor/ast-types/src/main.ts"),
   },
-  exports: {
-    legacy: true,
+  dts: {
+    compilerOptions: {
+      removeComments: false,
+    },
   },
+  publint: true,
+  attw: true,
+  clean: true,
+  sourcemap: false,
   deps: {
     neverBundle: ["yuku-parser"],
     onlyBundle: false,
