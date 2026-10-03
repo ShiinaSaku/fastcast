@@ -184,19 +184,19 @@ Performance comparison between the latest upstream release (`magicast@0.5.5` usi
 
 | Benchmark Case | `magicast@0.5.5` | fastcast (`yuku-parser`) | Speedup |
 | :--- | :---: | :---: | :---: |
-| **Small Config Parse (vite.config.ts)** | 8,170 ops/s (`0.122 ms`) | **12,575 ops/s** (`0.080 ms`) | **+53.9% (1.54x)** |
-| **Medium Config Parse (nuxt.config.ts)** | 3,399 ops/s (`0.294 ms`) | **5,215 ops/s** (`0.192 ms`) | **+53.4% (1.53x)** |
-| **Large TS Module Parse (~1,000 lines)** | 101 ops/s (`9.857 ms`) | **127 ops/s** (`7.862 ms`) | **+25.7% (1.26x)** |
-| **E2E: Parse + Mutate + Codegen (Vite)** | 2,861 ops/s (`0.349 ms`) | **3,380 ops/s** (`0.296 ms`) | **+18.1% (1.18x)** |
-| **E2E: Parse + Mutate + Codegen (Nuxt)** | 1,470 ops/s (`0.680 ms`) | **1,734 ops/s** (`0.577 ms`) | **+18.0% (1.18x)** |
+| **Small Config Parse (vite.config.ts)** | 8,104 ops/s (`0.123 ms`) | **12,333 ops/s** (`0.081 ms`) | **+52.2% (1.52x)** |
+| **Medium Config Parse (nuxt.config.ts)** | 3,364 ops/s (`0.297 ms`) | **4,977 ops/s** (`0.201 ms`) | **+47.9% (1.48x)** |
+| **Large TS Module Parse (~1,000 lines)** | 100 ops/s (`9.978 ms`) | **128 ops/s** (`7.830 ms`) | **+28.0% (1.28x)** |
+| **E2E: Parse + Mutate + Codegen (Vite)** | 3,007 ops/s (`0.333 ms`) | **3,061 ops/s** (`0.327 ms`) | **+1.8% (1.02x)** |
+| **E2E: Parse + Mutate + Codegen (Nuxt)** | 1,450 ops/s (`0.690 ms`) | **1,595 ops/s** (`0.627 ms`) | **+10.0% (1.10x)** |
 
 ### Footprint & Efficiency
 
 | Metric | `magicast@0.5.5` (Babel) | fastcast (`yuku-parser`) | Improvement |
 | :--- | :---: | :---: | :---: |
 | **Parser Dependencies on Disk** | 4.53 MB | **0.05 MB** | **-99.0% smaller** |
-| **Cold Start (Module Load)** | 78.3 ms | **75.8 ms** | **~3.2% faster** |
-| **Heap Memory Growth (1,000 parses)** | 36.53 MB | **39.31 MB** | **+7.6%** |
+| **Cold Start (Module Load)** | 79.4 ms | **78.0 ms** | **~1.8% faster** |
+| **Heap Memory Growth (1,000 parses)** | 44.21 MB | **39.33 MB** | **~11.0% less** |
 <!-- benchmark:end -->
 
 ## Development
