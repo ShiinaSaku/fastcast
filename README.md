@@ -178,25 +178,25 @@ See the [source code](./src/helpers) and [test cases](./test/helpers) for full h
 
 Performance comparison between the latest upstream release (`magicast@0.5.5` using Babel) and fastcast (powered by [`yuku-parser`](https://github.com/yuku-toolchain/yuku)).
 
-*Last updated: 2026-10-03 (Node.js v24.21.0, darwin arm64)*
+*Last updated: 2026-10-05 (Node.js v24.21.0, linux x64)*
 
 ### Performance & Throughput
 
 | Benchmark Case | `magicast@0.5.5` | fastcast (`yuku-parser`) | Speedup |
 | :--- | :---: | :---: | :---: |
-| **Small Config Parse (vite.config.ts)** | 8,104 ops/s (`0.123 ms`) | **12,333 ops/s** (`0.081 ms`) | **+52.2% (1.52x)** |
-| **Medium Config Parse (nuxt.config.ts)** | 3,364 ops/s (`0.297 ms`) | **4,977 ops/s** (`0.201 ms`) | **+47.9% (1.48x)** |
-| **Large TS Module Parse (~1,000 lines)** | 100 ops/s (`9.978 ms`) | **128 ops/s** (`7.830 ms`) | **+28.0% (1.28x)** |
-| **E2E: Parse + Mutate + Codegen (Vite)** | 3,007 ops/s (`0.333 ms`) | **3,061 ops/s** (`0.327 ms`) | **+1.8% (1.02x)** |
-| **E2E: Parse + Mutate + Codegen (Nuxt)** | 1,450 ops/s (`0.690 ms`) | **1,595 ops/s** (`0.627 ms`) | **+10.0% (1.10x)** |
+| **Small Config Parse (vite.config.ts)** | 4,504 ops/s (`0.222 ms`) | **7,093 ops/s** (`0.141 ms`) | **+57.5% (1.57x)** |
+| **Medium Config Parse (nuxt.config.ts)** | 2,188 ops/s (`0.457 ms`) | **3,288 ops/s** (`0.304 ms`) | **+50.3% (1.50x)** |
+| **Large TS Module Parse (~1,000 lines)** | 63 ops/s (`15.750 ms`) | **91 ops/s** (`10.933 ms`) | **+44.4% (1.44x)** |
+| **E2E: Parse + Mutate + Codegen (Vite)** | 1,660 ops/s (`0.602 ms`) | **1,611 ops/s** (`0.621 ms`) | **-3.0% (0.97x)** |
+| **E2E: Parse + Mutate + Codegen (Nuxt)** | 948 ops/s (`1.055 ms`) | **1,129 ops/s** (`0.885 ms`) | **+19.1% (1.19x)** |
 
 ### Footprint & Efficiency
 
 | Metric | `magicast@0.5.5` (Babel) | fastcast (`yuku-parser`) | Improvement |
 | :--- | :---: | :---: | :---: |
 | **Parser Dependencies on Disk** | 4.53 MB | **0.05 MB** | **-99.0% smaller** |
-| **Cold Start (Module Load)** | 79.4 ms | **78.0 ms** | **~1.8% faster** |
-| **Heap Memory Growth (1,000 parses)** | 44.21 MB | **39.33 MB** | **~11.0% less** |
+| **Cold Start (Module Load)** | 63.4 ms | **60.8 ms** | **~4.0% faster** |
+| **Heap Memory Growth (1,000 parses)** | 37.17 MB | **47.42 MB** | **+27.6%** |
 <!-- benchmark:end -->
 
 ## Development
