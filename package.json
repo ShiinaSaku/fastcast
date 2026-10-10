@@ -2,7 +2,7 @@
   "name": "fastcast",
   "type": "module",
   "version": "0.0.3",
-  "packageManager": "pnpm@12.9.1",
+  "packageManager": "pnpm@12.10.1",
   "description": "Programmatically modify JavaScript and TypeScript source codes with a simplified, elegant syntax. Powered by yuku-parser.",
   "author": "shiinasaku <saku@shiina.xyz>",
   "license": "MIT",
