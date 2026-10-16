@@ -2,7 +2,7 @@
   "name": "fastcast",
   "type": "module",
   "version": "0.0.3",
-  "packageManager": "pnpm@12.10.1",
+  "packageManager": "pnpm@12.11.2",
   "description": "Programmatically modify JavaScript and TypeScript source codes with a simplified, elegant syntax. Powered by yuku-parser.",
   "author": "shiinasaku <saku@shiina.xyz>",
   "license": "MIT",
@@ -58,14 +58,14 @@
   },
   "dependencies": {
     "source-map-js": "^1.2.2",
-    "yuku-parser": "^0.17.0"
+    "yuku-parser": "^0.19.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.5.1",
     "@arethetypeswrong/core": "^0.18.5",
-    "@types/node": "^26.6.4",
-    "@vitest/coverage-v8": "^5.0.3",
-    "@vitest/ui": "^5.0.3",
+    "@types/node": "^26.6.5",
+    "@vitest/coverage-v8": "^5.0.4",
+    "@vitest/ui": "^5.0.4",
     "ast-types": "^0.16.3",
     "bumpp": "^12.3.0",
     "changelogen": "^0.6.2",
@@ -74,16 +74,16 @@
     "giget": "^3.3.1",
     "jiti": "^2.7.0",
     "nano-staged": "^1.0.2",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "publint": "^0.3.25",
     "recast": "^0.24.0",
     "simple-git-hooks": "^2.14.0",
     "source-map": "npm:source-map-js@latest",
     "taze": "^21.3.0",
-    "tsdown": "^0.23.0",
+    "tsdown": "^0.23.1",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.4"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm nano-staged"
