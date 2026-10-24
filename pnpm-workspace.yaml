@@ -1,5 +1,4 @@
 ignoreWorkspaceRootCheck: true
-
 minimumReleaseAgeExcludePrune: true
 minimumReleaseAgeExclude:
   - "@yuku-core/binding-android-arm64@0.17.0"
